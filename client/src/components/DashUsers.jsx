@@ -1,6 +1,4 @@
-/* eslint-disable react/jsx-key */
 /* eslint-disable react-hooks/exhaustive-deps */
-
 import { Table, Modal, Button } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -12,7 +10,7 @@ export default function DashUsers() {
   const [users, setUsers] = useState([]);
   const [showMore, setShowMore] = useState(true);
   const [showModal, setShowModal] = useState(false);
-
+  const [userIdToDelete, setUserIdToDelete] = useState("");
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -43,6 +41,22 @@ export default function DashUsers() {
         if (data.users.length < 9) {
           setShowMore(false);
         }
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  const handleDeleteUser = async () => {
+    try {
+      const res = await fetch(`/api/user/delete/${userIdToDelete}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUsers((prev) => prev.filter((user) => user._id !== userIdToDelete));
+        setShowModal(false);
+      } else {
+        console.log(data.message);
       }
     } catch (error) {
       console.log(error.message);
@@ -88,6 +102,7 @@ export default function DashUsers() {
                     <span
                       onClick={() => {
                         setShowModal(true);
+                        setUserIdToDelete(user._id);
                       }}
                       className="font-md text-red-500 hover:underline cursor-pointer"
                     >
@@ -124,7 +139,9 @@ export default function DashUsers() {
               Are you sure you want delete this user?
             </h3>
             <div className="flex justify-center gap-4">
-              <Button color="failure">Yes,sure</Button>
+              <Button color="failure" onClick={handleDeleteUser}>
+                Yes,sure
+              </Button>
               <Button color="gray" onClick={() => setShowModal(false)}>
                 No,cancel
               </Button>
