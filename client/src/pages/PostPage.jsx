@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { Spinner } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -15,6 +14,7 @@ export default function PostPage() {
         setLoading(true);
         const res = await fetch(`/api/post/getposts?slug=${postSlug}`);
         const data = await res.json();
+        console.log("Fetched data:", data);
         if (!res.ok) {
           setError(true);
           setLoading(false);
@@ -26,6 +26,7 @@ export default function PostPage() {
           setError(false);
         }
       } catch (error) {
+        console.error("Error fetching post:", error);
         setError(true);
         setLoading(false);
       }
@@ -39,10 +40,18 @@ export default function PostPage() {
         <Spinner size="xl" />
       </div>
     );
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p>Error loading post. Please try again later.</p>
+      </div>
+    );
+  }
+
   return (
     <main className="p-3 flex flex-col max-w-6xl mx-auto min-h-screen">
       <h1 className="text-3xl mt-10 p-3 text-center font-serif max-w-2xl mx-auto lg:text-4xl">
-        {post && post.title}
+        {post ? post.title : "Post title not available"}
       </h1>
     </main>
   );
